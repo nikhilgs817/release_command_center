@@ -1,0 +1,35 @@
+[Unit]
+Description=Release Command Center API
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=120
+StartLimitBurst=10
+
+[Service]
+Type=simple
+User=releasecc
+Group=releasecc
+WorkingDirectory=/opt/release-command-center/current
+EnvironmentFile=/etc/release-command-center/app.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+# TRUSTED_PROXY_IPS is a comma-separated list of actual company load balancer IPs.
+# Backend certificates must match the host names used by the load balancer.
+ExecStart=/opt/release-command-center/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1 --proxy-headers --forwarded-allow-ips ${TRUSTED_PROXY_IPS} --ssl-certfile /etc/release-command-center/tls/server.crt --ssl-keyfile /etc/release-command-center/tls/server.key --no-access-log
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+UMask=0077
+MemoryMax=2G
+TasksMax=256
+LimitNOFILE=16384
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

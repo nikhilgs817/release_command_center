@@ -1,0 +1,3 @@
+-r requirements.txt
+ibm_db==3.3.0
+ibm_db_sa==0.4.4

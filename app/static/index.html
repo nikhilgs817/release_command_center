@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Release Command Center</title><link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script></head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/"><span class="brand-mark">r<span>↗</span></span><span>RELEASE<span class="brand-small">COMMAND CENTER</span></span></a>
+  <div class="workspace-label">WORKSPACE <span>01</span></div>
+  <nav aria-label="Main navigation">
+    <button class="nav active" data-tab="overview"><span>◫</span>Release overview</button>
+    <button class="nav" data-tab="activities"><span>☷</span>Activity register</button>
+    <button class="nav" data-tab="defects"><span>⌘</span>Defect traceability</button>
+    <button class="nav" data-tab="inbox"><span>✉</span>Stakeholder inbox<span id="inbox-count" class="nav-count">0</span></button>
+    <button class="nav" data-tab="audit"><span>◷</span>Audit trail</button>
+  </nav>
+  <div class="workspace-label second-label">SYSTEM</div>
+  <nav aria-label="System navigation"><button class="nav" data-tab="integrations"><span>⇄</span>Integrations</button><button class="nav" data-tab="infrastructure"><span>▤</span>Infrastructure</button></nav>
+  <div class="sidebar-bottom"><span class="avatar">RC</span><span>Release operations<small id="identity-label">Local demonstration</small></span><button class="icon-button" id="signout" aria-label="Sign out">↪</button></div>
+</aside>
+<div class="app-shell">
+  <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> <strong id="breadcrumb-title">Release overview</strong></div><form id="search-form" class="search"><span>⌕</span><input id="search-input" aria-label="Search release records" placeholder="Find a defect, task, commit or build…"><kbd>Enter</kbd></form><span class="mode-label" id="mode-label">Loading</span></header>
+  <main>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <div class="page-heading"><div><div class="eyebrow">RELEASE OPERATIONS</div><h1 id="page-title">Release overview</h1><p id="page-subtitle">Every activity, stakeholder and promotion. One shared view.</p></div><button class="button secondary" id="new-release">＋ New release</button></div>
+    <section class="release-bar" aria-label="Selected release"><span class="release-icon">↗</span><div><label for="release-picker">ACTIVE RELEASE</label><select id="release-picker"></select></div><span id="release-version" class="version-tag"></span><span class="release-divider"></span><span id="change-number" class="muted"></span><button class="text-button" id="refresh">↻ Refresh</button></section>
+    <div id="content" aria-live="polite"><div class="loading">Loading your release workspace…</div></div>
+    <footer><span>Release Command Center <span class="footer-dot">·</span> <span id="footer-mode">Local workspace</span></span><span id="last-refresh"></span></footer>
+  </main>
+</div>
+<dialog id="modal"><div class="modal-header"><h2 id="modal-title"></h2><button class="icon-button" id="close-modal" aria-label="Close dialog">×</button></div><div id="modal-body"></div></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+<button id="chat-toggle" class="chat-toggle" aria-expanded="false" aria-controls="release-chat">✦ Ask Release</button>
+<section id="release-chat" class="chat-panel" aria-label="Release assistant" hidden>
+  <div class="chat-header"><div><strong>Ask Release</strong><small>Answers from your release records</small></div><button id="chat-close" class="icon-button" aria-label="Close release assistant">×</button></div>
+  <div id="chat-scope" class="chat-scope"></div>
+  <div id="chat-history" class="chat-history" role="log" aria-live="polite"></div>
+  <div class="chat-examples"><button data-question="What is the status of defect 1842?">Defect status</button><button data-question="Is CTASK 3204 completed in INT?">Task completion</button><button data-question="What is pending in QAT?">Pending in QAT</button></div>
+  <form id="chat-form"><label class="sr-only" for="chat-question">Ask about a defect or task</label><input id="chat-question" placeholder="Is SCTASK 1234 completed in QAT?" maxlength="1000" required autocomplete="off"><button class="button small" id="chat-send" type="submit">Ask →</button></form>
+  <div class="chat-disclaimer">Uses the last stored status. No external AI service.</div>
+</section>
+<script src="/static/chat.js" defer></script>
+</body></html>

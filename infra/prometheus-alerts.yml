@@ -1,0 +1,38 @@
+groups:
+  - name: release-command-center
+    rules:
+      - alert: ReleaseApiUnavailable
+        expr: sum(up{job="release-command-center-api"}) < 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: No release API target is being scraped successfully
+      - alert: ReleaseApiErrorRate
+        expr: sum(rate(rcc_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(rcc_http_requests_total[5m])), 0.01) > 0.02
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Release API server-error ratio exceeds 2 percent
+      - alert: ReleaseApiLatency
+        expr: histogram_quantile(0.95, sum by (le) (rate(rcc_http_request_seconds_bucket[5m]))) > 2
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Release API p95 response time exceeds two seconds
+      - alert: ReleaseWorkersUnavailable
+        expr: max(rcc_workers_healthy) < 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: No release integration worker has a recent heartbeat
+      - alert: ReleaseExternalOutcomeUncertain
+        expr: max(rcc_messages{status="uncertain"}) > 0 or max(rcc_jobs{status="uncertain"}) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Reconcile an uncertain external write before retrying it

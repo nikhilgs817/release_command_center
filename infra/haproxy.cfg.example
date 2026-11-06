@@ -1,0 +1,44 @@
+# Reference configuration only. Prefer your existing redundant company load balancer.
+# Replace addresses, domain and certificate paths; validate on the approved HAProxy version.
+global
+    log /dev/log local0
+    user haproxy
+    group haproxy
+    daemon
+    ssl-default-bind-options ssl-min-ver TLSv1.2
+    ssl-default-server-options ssl-min-ver TLSv1.2
+
+defaults
+    log global
+    mode http
+    timeout connect 5s
+    timeout client 60s
+    timeout server 60s
+    timeout check 5s
+    retries 0
+
+frontend release_http
+    bind :80
+    http-request redirect scheme https code 301
+
+frontend release_https
+    bind :443 ssl crt /etc/haproxy/tls/release.company.example.pem
+    acl correct_host hdr(host) -i release.company.example release.company.example:443
+    http-request deny unless correct_host
+    # Scrape/health access is via the private monitoring network and backend ports.
+    acl internal_only path_beg /metrics /health/
+    http-request deny if internal_only
+    http-request del-header X-Forwarded-For
+    http-request set-header X-Forwarded-For %[src]
+    http-request set-header X-Forwarded-Proto https
+    http-response set-header Strict-Transport-Security "max-age=31536000"
+    default_backend release_apis
+
+backend release_apis
+    balance roundrobin
+    option httpchk
+    http-check send meth GET uri /health/ready ver HTTP/1.1 hdr Host release.company.example
+    http-check expect status 200
+    # Backend TLS is verified. Company CA must contain the issuing root/intermediate.
+    server app01 app01.company.example:8000 check inter 5s fall 3 rise 2 ssl verify required ca-file /etc/haproxy/tls/company-ca.pem sni str(app01.company.example) verifyhost app01.company.example
+    server app02 app02.company.example:8000 check inter 5s fall 3 rise 2 ssl verify required ca-file /etc/haproxy/tls/company-ca.pem sni str(app02.company.example) verifyhost app02.company.example

@@ -1,0 +1,8 @@
+fastapi==0.162.0
+uvicorn==0.54.0
+httpx>=0.28,<1
+python-dotenv>=1.2,<2
+pytest>=8,<10
+SQLAlchemy>=2.0,<2.2
+PyJWT[crypto]>=2.10,<3
+prometheus-client>=0.22,<1
